@@ -75,10 +75,14 @@ export default function DayPage() {
               }
             </div>
           </div>
-          {csDone
-            ? <div className="day-block-done-label">Выполнено</div>
-            : <a href={csHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
-          }
+          {csDone ? (
+            <div className="day-block-footer">
+              <div className="day-block-done-label">✓ Выполнено</div>
+              <a href={csHref} className="day-block-repeat">Повторить →</a>
+            </div>
+          ) : (
+            <a href={csHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
+          )}
         </div>
 
         <div className={'day-block' + (voiceDone ? ' block-done' : '')}>
@@ -102,10 +106,14 @@ export default function DayPage() {
               }
             </div>
           </div>
-          {voiceDone
-            ? <div className="day-block-done-label">Выполнено</div>
-            : <a href={voiceHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
-          }
+          {voiceDone ? (
+            <div className="day-block-footer">
+              <div className="day-block-done-label">✓ Выполнено</div>
+              <a href={voiceHref} className="day-block-repeat">Повторить →</a>
+            </div>
+          ) : (
+            <a href={voiceHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
+          )}
         </div>
       </div>
     </div>

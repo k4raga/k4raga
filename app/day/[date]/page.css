@@ -146,12 +146,28 @@
 }
 .day-block-btn:hover { opacity: .85; transform: translateY(-1px); }
 
+.day-block-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 .day-block-done-label {
-  text-align: center;
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
   letter-spacing: 3px;
   color: #4ade80;
   text-transform: uppercase;
-  opacity: .7;
 }
+.day-block-repeat {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all .2s;
+}
+.day-block-repeat:hover { border-color: rgba(212,0,0,0.4); color: var(--white); }
