@@ -41,7 +41,10 @@ export default function Home() {
   return (
     <div className="home">
       <nav className="home-topbar">
-        <a href={HUB_URL} className="home-topbar-logo">K4RAGA</a>
+        <a href={HUB_URL} className="home-topbar-logo">
+          <img src="/logo.jpg" alt="K4RAGA" className="cs-topbar-img" />
+          K4RAGA
+        </a>
         <span className="home-topbar-title">CS ТРЕНИРОВКА</span>
       </nav>
 

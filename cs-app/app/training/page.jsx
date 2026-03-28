@@ -192,7 +192,10 @@ function CSTrainingContent() {
   return (
     <div className="cs-page">
       <nav className="cs-topbar">
-        <a href={HUB_URL} className="cs-topbar-logo">K4RAGA</a>
+        <a href={HUB_URL} className="cs-topbar-logo">
+          <img src="/logo.jpg" alt="K4RAGA" className="cs-topbar-img" />
+          K4RAGA
+        </a>
         <span className="cs-topbar-title">CS ТРЕНИРОВКА</span>
       </nav>
 

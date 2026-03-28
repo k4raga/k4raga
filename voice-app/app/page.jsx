@@ -148,7 +148,10 @@ function VoiceTrainingContent() {
   return (
     <div className="vt-page">
       <nav className="vt-topbar">
-        <a href={HUB_URL} className="vt-topbar-logo">K4RAGA</a>
+        <a href={HUB_URL} className="vt-topbar-logo">
+          <img src="/logo.jpg" alt="K4RAGA" className="vt-topbar-img" />
+          K4RAGA
+        </a>
         <span className="vt-topbar-title">ГОЛОС</span>
       </nav>
 

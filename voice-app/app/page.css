@@ -12,11 +12,20 @@
   height: 56px;
 }
 .vt-topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 22px;
   letter-spacing: 4px;
   color: var(--red);
   text-decoration: none;
+}
+.vt-topbar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
 }
 .vt-topbar-title {
   font-family: 'Orbitron', sans-serif;
