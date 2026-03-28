@@ -1,0 +1,172 @@
+.cs-page {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 80px 24px 60px;
+  font-family: 'Manrope', sans-serif;
+}
+.cs-header {
+  text-align: center;
+  margin-bottom: 36px;
+  animation: fadeUp .6s ease backwards;
+}
+.cs-header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  letter-spacing: 4px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.cs-header p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.cs-progress-wrap {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.cs-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), #ff4444);
+  border-radius: 2px;
+  transition: width .4s ease;
+}
+.cs-progress-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+
+.cs-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cs-task {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all .3s;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn .5s ease backwards;
+}
+.cs-task::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--red);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.cs-task:hover { border-color: rgba(212,0,0,0.3); transform: translateX(4px); }
+.cs-task:hover::before { opacity: 1; }
+.cs-task.done { border-color: rgba(74,222,128,0.2); background: rgba(74,222,128,0.04); }
+.cs-task.done::before { background: var(--green); opacity: 1; }
+
+.cs-task-number {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all .35s ease;
+}
+.cs-task.done .cs-task-number {
+  background: var(--green);
+  color: var(--bg);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+.cs-task.done .cs-task-number::after { content: '✓'; font-size: 16px; font-weight: 900; }
+
+.cs-task-info { flex: 1; }
+.cs-task-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  transition: all .3s;
+}
+.cs-task.done .cs-task-name {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(107,114,128,0.4);
+}
+.cs-task-hint { font-size: 12px; color: var(--muted); margin-top: 2px; letter-spacing: .5px; }
+
+.cs-task-icon {
+  width: 28px; height: 28px;
+  opacity: .4;
+  transition: opacity .3s;
+  flex-shrink: 0;
+}
+.cs-task:hover .cs-task-icon { opacity: .7; }
+.cs-task.done .cs-task-icon { opacity: .2; }
+.cs-task-icon svg { width: 100%; height: 100%; }
+
+.cs-complete-banner {
+  display: none;
+  text-align: center;
+  margin-top: 32px;
+  padding: 24px;
+  border: 1px solid rgba(74,222,128,0.2);
+  border-radius: 12px;
+  background: rgba(74,222,128,0.05);
+  animation: popIn .5s ease;
+}
+.cs-complete-banner.show { display: block; }
+.cs-complete-icon { margin-bottom: 12px; }
+.cs-complete-banner h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.cs-complete-banner p { color: var(--muted); font-size: 14px; }
+
+.cs-reset-wrap { margin-top: 36px; text-align: center; }
+.cs-reset-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 12px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .3s;
+}
+.cs-reset-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  box-shadow: 0 0 20px rgba(239,68,68,0.15);
+}
+
+.cs-footer {
+  margin-top: 48px;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted2);
+}

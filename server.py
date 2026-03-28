@@ -6,6 +6,7 @@ import os
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
 DB_PATH = os.path.join(BASE_DIR, 'training.db')
 
 def get_db():
@@ -24,15 +25,15 @@ def init_db():
             )
         ''')
 
-# --- Static files ---
+# --- Static files (React build) ---
 
-@app.route('/')
-def index():
-    return send_from_directory(BASE_DIR, 'index.html')
-
-@app.route('/<path:filename>')
-def static_files(filename):
-    return send_from_directory(BASE_DIR, filename)
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def static_files(path):
+    file_path = os.path.join(STATIC_DIR, path)
+    if path and os.path.exists(file_path) and not os.path.isdir(file_path):
+        return send_from_directory(STATIC_DIR, path)
+    return send_from_directory(STATIC_DIR, 'index.html')
 
 # --- API: date ---
 
