@@ -50,9 +50,51 @@ export default function Home() {
         </Link>
       </div>
 
-      {exercises.length > 0 && (
-        <div className="home-exercises">
-          <div className="home-exercises-label">ПРОГРАММА ТРЕНИРОВКИ</div>
+      <div className="home-columns">
+        <div className="home-col">
+          <div className="home-col-label">ИСТОРИЯ ТРЕНИРОВОК</div>
+          {days.length > 0 ? (
+            <div className="home-cards">
+              {days.map(([dateStr, data]) => {
+                const { day, month, weekday } = formatDate(dateStr)
+                const tasks   = data.cs_tasks || []
+                const doneCnt = tasks.filter(Boolean).length
+                const isToday = dateStr === today
+
+                return (
+                  <Link key={dateStr} href={`/training?date=${dateStr}`} className={'home-card' + (data.done ? ' card-done' : '')}>
+                    <div className="home-card-head">
+                      <div className="home-card-date">
+                        <span className="home-card-day">{day}</span>
+                        <span className="home-card-month">{month}</span>
+                        {isToday && <span className="home-card-today">сегодня</span>}
+                      </div>
+                      <div className="home-card-weekday">{weekday}</div>
+                      <div className={'home-card-badge' + (data.done ? ' badge-done' : ' badge-fail')}>
+                        {data.done ? 'GG WP' : `${doneCnt}/${exercises.length || tasks.length}`}
+                      </div>
+                    </div>
+                    <div className="home-card-tasks">
+                      {exercises.map((ex, i) => (
+                        <div key={ex.id} className={'home-card-task' + (tasks[i] ? ' task-done' : '')}>
+                          <span className="home-card-task-icon">{tasks[i] ? '✓' : '○'}</span>
+                          <span className="home-card-task-name">{ex.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : today ? (
+            <div className="home-empty">
+              <p>Тренировок ещё нет — начни первую!</p>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="home-col">
+          <div className="home-col-label">ПРОГРАММА ТРЕНИРОВКИ</div>
           <div className="home-ex-list">
             {exercises.map((ex) => (
               <div key={ex.id} className="home-ex-item">
@@ -65,51 +107,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      )}
-
-      {days.length > 0 && (
-        <div className="home-history">
-          <div className="home-history-label">ИСТОРИЯ ТРЕНИРОВОК</div>
-          <div className="home-cards">
-            {days.map(([dateStr, data]) => {
-              const { day, month, weekday } = formatDate(dateStr)
-              const tasks  = data.cs_tasks || []
-              const doneCnt = tasks.filter(Boolean).length
-              const isToday = dateStr === today
-
-              return (
-                <Link key={dateStr} href={`/training?date=${dateStr}`} className={'home-card' + (data.done ? ' card-done' : '')}>
-                  <div className="home-card-head">
-                    <div className="home-card-date">
-                      <span className="home-card-day">{day}</span>
-                      <span className="home-card-month">{month}</span>
-                      {isToday && <span className="home-card-today">сегодня</span>}
-                    </div>
-                    <div className="home-card-weekday">{weekday}</div>
-                    <div className={'home-card-badge' + (data.done ? ' badge-done' : ' badge-fail')}>
-                      {data.done ? 'GG WP' : `${doneCnt}/${exercises.length || tasks.length}`}
-                    </div>
-                  </div>
-                  <div className="home-card-tasks">
-                    {exercises.map((ex, i) => (
-                      <div key={ex.id} className={'home-card-task' + (tasks[i] ? ' task-done' : '')}>
-                        <span className="home-card-task-icon">{tasks[i] ? '✓' : '○'}</span>
-                        <span className="home-card-task-name">{ex.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {days.length === 0 && today && (
-        <div className="home-empty">
-          <p>Тренировок ещё нет — начни первую!</p>
-        </div>
-      )}
+      </div>
 
       <div className="home-footer">K4RAGA © 2026</div>
     </div>
