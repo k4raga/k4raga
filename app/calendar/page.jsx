@@ -34,37 +34,10 @@ const APPS = [
     ),
   },
   {
-    href: `${ROUTINE_URL}/kkal`,
-    tag: 'NUTRITION',
-    title: 'Ккал',
-    sub: 'Подсчёт калорий и питание',
-    icon: (
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-        <path d="M8 4 C8 4 6 10 6 14 a10 10 0 0 0 20 0 C26 10 24 4 24 4"/>
-        <line x1="16" y1="4" x2="16" y2="24"/>
-      </svg>
-    ),
-  },
-  {
-    href: `${ROUTINE_URL}/sport`,
-    tag: 'FITNESS',
-    title: 'Спорт',
-    sub: 'Тренировки и физическая активность',
-    icon: (
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
-        <circle cx="16" cy="8" r="3"/>
-        <line x1="16" y1="11" x2="16" y2="22"/>
-        <line x1="8" y1="15" x2="24" y2="15"/>
-        <line x1="16" y1="22" x2="10" y2="30"/>
-        <line x1="16" y1="22" x2="22" y2="30"/>
-      </svg>
-    ),
-  },
-  {
     href: ROUTINE_URL,
-    tag: 'DAILY',
+    tag: 'DAILY ROUTINE',
     title: 'Рутина',
-    sub: 'Ежедневные привычки и задачи',
+    sub: 'Ккал · Спорт · Привычки',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
         <rect x="4" y="4" width="24" height="24" rx="2"/>

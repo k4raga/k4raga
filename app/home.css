@@ -92,7 +92,7 @@
 /* === Apps grid === */
 .apps-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   width: 100%;
   max-width: 680px;
@@ -161,7 +161,7 @@
 }
 .app-card:hover .app-card-arrow { color: var(--red); }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .apps-grid { grid-template-columns: 1fr; }
 }
 
