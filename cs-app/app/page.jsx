@@ -41,7 +41,7 @@ export default function Home() {
       <div className="home-hero">
         <div className="home-hero-tag">COUNTER-STRIKE</div>
         <h1 className="home-hero-title">CS Тренировка</h1>
-        <p className="home-hero-sub">Прицел, стрейф, дигл, снайпер</p>
+        <p className="home-hero-sub">Аим · Мувмент · Пистолеты · Автоматы · Снайпинг</p>
         <Link
           href={today ? `/training?date=${today}` : '/training'}
           className={'home-start-btn' + (todayDone ? ' done' : '')}

@@ -27,20 +27,25 @@ export default function getDb() {
 
     try { db.exec("ALTER TABLE training ADD COLUMN cs_selected TEXT DEFAULT '[]'") } catch (_) {}
 
-    const first = db.prepare('SELECT name FROM exercises WHERE id = 1').get()
-    if (!first || first.name !== 'Аим') {
-      db.prepare('DELETE FROM exercises').run()
-      const insert = db.prepare('INSERT INTO exercises (num, name, hint) VALUES (?, ?, ?)')
-      const seed = db.transaction(() => {
-        insert.run('01', 'Аим',        'Постановка прицела, хедшоты')
-        insert.run('02', 'Мувмент',    'Остановка на W, стреляем и ползём')
-        insert.run('03', 'Пистолеты', 'Дигл, беретта, П250, П200, УСП')
-        insert.run('04', 'Вторичное', 'Галил, МП7, МП9, МАК10, Фамас')
-        insert.run('05', 'Снайпинг',  'Скаут, АВП')
-        insert.run('06', 'Чиловая катка', 'Deathmatch или casual — закрепляем всё на практике')
-      })
-      seed()
-    }
+    const EXERCISES = [
+      ['01', 'Аим',           'Постановка прицела, хедшоты'],
+      ['02', 'Мувмент',       'Контрастрейф, спрей в движении'],
+      ['03', 'Пистолеты',     'Дигл, Беретта, П250, П200, УСП'],
+      ['04', 'Автоматы',      'Галил, МП7, МП9, МАК10, Фамас'],
+      ['05', 'Снайпинг',      'Скаут, АВП'],
+      ['06', 'Чиловая катка', 'Deathmatch, Casual'],
+    ]
+    const count = db.prepare('SELECT COUNT(*) as n FROM exercises').get().n
+    const sync = db.transaction(() => {
+      if (count === 0) {
+        const insert = db.prepare('INSERT INTO exercises (num, name, hint) VALUES (?, ?, ?)')
+        EXERCISES.forEach(([num, name, hint]) => insert.run(num, name, hint))
+      } else {
+        const update = db.prepare('UPDATE exercises SET num = ?, name = ?, hint = ? WHERE id = ?')
+        EXERCISES.forEach(([num, name, hint], i) => update.run(num, name, hint, i + 1))
+      }
+    })
+    sync()
   }
   return db
 }
