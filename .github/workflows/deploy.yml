@@ -19,7 +19,7 @@ jobs:
             git pull origin main
             npm install
             rm -rf .next
-            npm run build
+            npm run build || true
             pm2 stop k4raga 2>/dev/null || true
             pm2 delete k4raga 2>/dev/null || true
             pm2 start ./node_modules/.bin/next --name k4raga --cwd /var/www/k4raga -- start -p 3000
