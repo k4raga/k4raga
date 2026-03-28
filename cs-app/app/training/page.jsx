@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
@@ -21,14 +21,116 @@ const TASKS = [
     icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><rect x="2" y="8" width="28" height="16" rx="3"/><rect x="8" y="13" width="6" height="6"/><circle cx="22" cy="14" r="1.5" fill="#D40000"/><circle cx="22" cy="19" r="1.5" fill="#D40000"/><circle cx="19" cy="16.5" r="1.5" fill="#D40000"/><circle cx="25" cy="16.5" r="1.5" fill="#D40000"/></svg> }
 ]
 
+const MONTH_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
+const MONTH_FULL  = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
+const WEEK = ['пн','вт','ср','чт','пт','сб','вс']
+
+function toDateStr(y, m, d) {
+  return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0')
+}
+
+function formatDisplay(dateStr) {
+  if (!dateStr) return '—'
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return d + ' ' + MONTH_FULL[m - 1] + ' ' + y
+}
+
+function DatePicker({ dateKey, history, onChange }) {
+  const today = new Date()
+  const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
+
+  const [open, setOpen] = useState(false)
+  const [year, setYear]   = useState(() => dateKey ? Number(dateKey.split('-')[0]) : today.getFullYear())
+  const [month, setMonth] = useState(() => dateKey ? Number(dateKey.split('-')[1]) - 1 : today.getMonth())
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (dateKey) {
+      setYear(Number(dateKey.split('-')[0]))
+      setMonth(Number(dateKey.split('-')[1]) - 1)
+    }
+  }, [dateKey])
+
+  useEffect(() => {
+    if (!open) return
+    function handle(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [open])
+
+  function prevMonth() { if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1) }
+  function nextMonth() { if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1) }
+
+  const firstDay   = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const startOffset = (firstDay + 6) % 7 // Mon-first
+
+  const cells = []
+  for (let i = 0; i < startOffset; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+
+  return (
+    <div className="cs-datepicker" ref={ref}>
+      <button className="cs-date-btn" onClick={() => setOpen(o => !o)}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square">
+          <rect x="1" y="2" width="14" height="13" rx="1"/><line x1="1" y1="6" x2="15" y2="6"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/>
+        </svg>
+        <span>{formatDisplay(dateKey)}</span>
+        <span className="cs-date-arrow">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="cs-cal-dropdown">
+          <div className="cs-cal-nav">
+            <button className="cs-cal-nav-btn" onClick={prevMonth}>‹</button>
+            <span className="cs-cal-nav-label">{MONTH_SHORT[month]} {year}</span>
+            <button className="cs-cal-nav-btn" onClick={nextMonth}>›</button>
+          </div>
+          <div className="cs-cal-week">
+            {WEEK.map(w => <span key={w}>{w}</span>)}
+          </div>
+          <div className="cs-cal-grid">
+            {cells.map((d, i) => {
+              if (!d) return <span key={i} className="cs-cal-empty" />
+              const ds = toDateStr(year, month, d)
+              const isToday    = ds === todayStr
+              const isSelected = ds === dateKey
+              const isDone     = history[ds]?.done
+              const hasRecord  = ds in history
+              return (
+                <button key={i} onClick={() => { onChange(ds); setOpen(false) }}
+                  className={
+                    'cs-cal-day' +
+                    (isSelected ? ' selected' : '') +
+                    (isToday    ? ' today'    : '') +
+                    (isDone     ? ' done'     : '') +
+                    (hasRecord && !isDone ? ' partial' : '')
+                  }>
+                  {d}
+                  {hasRecord && <span className="cs-cal-dot" />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function CSTrainingContent() {
   const searchParams = useSearchParams()
-  const [checked, setChecked] = useState(Array(TASKS.length).fill(false))
-  const [dateKey, setDateKey] = useState(null)
-  const [popup, setPopup] = useState(false)
+  const [checked,  setChecked]  = useState(Array(TASKS.length).fill(false))
+  const [dateKey,  setDateKey]  = useState(null)
+  const [history,  setHistory]  = useState({})
+  const [popup,    setPopup]    = useState(false)
 
-  const done = checked.filter(Boolean).length
+  const done  = checked.filter(Boolean).length
   const total = TASKS.length
+
+  useEffect(() => {
+    fetch('/api/training').then(r => r.json()).then(setHistory).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const paramDate = searchParams.get('date')
@@ -48,12 +150,23 @@ function CSTrainingContent() {
     }).catch(() => {})
   }, [searchParams])
 
+  function loadDate(key) {
+    setDateKey(key)
+    setPopup(false)
+    window.history.replaceState(null, '', '/training?date=' + key)
+    fetch('/api/training/' + key).then(r => r.json()).then(data => {
+      const saved = data.cs_tasks || []
+      setChecked(TASKS.map((_, i) => !!saved[i]))
+    }).catch(() => setChecked(Array(TASKS.length).fill(false)))
+  }
+
   function toggle(i) {
     const next = checked.map((v, j) => j === i ? !v : v)
     setChecked(next)
     const allDone = next.every(Boolean)
     if (allDone) setPopup(true)
     if (dateKey) {
+      setHistory(h => ({ ...h, [dateKey]: { done: allDone, cs_tasks: next } }))
       fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,6 +178,7 @@ function CSTrainingContent() {
   function reset() {
     setChecked(Array(TASKS.length).fill(false))
     if (dateKey) {
+      setHistory(h => ({ ...h, [dateKey]: { done: false, cs_tasks: [] } }))
       fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,6 +199,7 @@ function CSTrainingContent() {
       <div className="cs-header">
         <h1>CS Тренировка</h1>
         <p>Выполни все задачи перед каткой</p>
+        <DatePicker dateKey={dateKey} history={history} onChange={loadDate} />
         <div className="cs-progress-wrap">
           <div className="cs-progress-bar" style={{ width: (done / total * 100) + '%' }} />
         </div>
