@@ -4,9 +4,9 @@ export function middleware(request) {
   const host = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
 
-  if (host.startsWith('calendar.') && !pathname.startsWith('/calendar') && !pathname.startsWith('/_next') && !pathname.startsWith('/api')) {
+  if (host.startsWith('calendar.') && pathname === '/') {
     const url = request.nextUrl.clone()
-    url.pathname = '/calendar' + (pathname === '/' ? '' : pathname)
+    url.pathname = '/calendar'
     return NextResponse.rewrite(url)
   }
 }

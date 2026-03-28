@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import './page.css'
 
-const CS_URL    = process.env.NEXT_PUBLIC_CS_URL    || 'https://cs.k4raga.ru'
-const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL || 'https://voice.k4raga.ru'
+const CS_URL      = process.env.NEXT_PUBLIC_CS_URL      || 'https://cs.k4raga.ru'
+const VOICE_URL   = process.env.NEXT_PUBLIC_VOICE_URL   || 'https://voice.k4raga.ru'
+const ROUTINE_URL = process.env.NEXT_PUBLIC_ROUTINE_URL || 'https://routine.k4raga.ru'
 
 const MONTH_NAMES = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
 const CS_TASK_NAMES = ['Постановка прицела','Остановка на W','Дигл','Стреляем и ползём','Скаут / АВП','Чиловая катка']
@@ -32,17 +33,19 @@ export default function DayPage() {
       .catch(() => setData({}))
   }, [date])
 
-  const isToday = todayKey === date
-  const csDone = data?.cs
-  const voiceDone = data?.voice
-  const allDone = csDone && voiceDone
+  const isToday    = todayKey === date
+  const csDone     = data?.cs
+  const voiceDone  = data?.voice
+  const routineDone = data?.routine
+  const allDone    = csDone && voiceDone && routineDone
 
   const [y, m, d] = date.split('-').map(Number)
   const weekday = new Date(y, m - 1, d).toLocaleDateString('ru-RU', { weekday: 'long' })
 
-  const csHref       = `${CS_URL}/training?date=${date}`
-  const csRepeatHref = `${CS_URL}/training?date=${date}&reset=1`
-  const voiceHref    = `${VOICE_URL}/?date=${date}`
+  const csHref        = `${CS_URL}/training?date=${date}`
+  const csRepeatHref  = `${CS_URL}/training?date=${date}&reset=1`
+  const voiceHref     = `${VOICE_URL}/?date=${date}`
+  const routineHref   = `${ROUTINE_URL}/?date=${date}`
 
   return (
     <div className="day-page">
@@ -125,6 +128,37 @@ export default function DayPage() {
             </div>
           ) : (
             <a href={voiceHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
+          )}
+        </div>
+
+        <div className={'day-block' + (routineDone ? ' block-done' : '')}>
+          <div className="day-block-top">
+            <div className="day-block-icon">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+                <rect x="4" y="4" width="24" height="24" rx="2"/>
+                <line x1="10" y1="12" x2="22" y2="12"/>
+                <line x1="10" y1="16" x2="22" y2="16"/>
+                <line x1="10" y1="20" x2="16" y2="20"/>
+              </svg>
+            </div>
+            <div className="day-block-info">
+              <div className="day-block-title">Рутина</div>
+              <div className="day-block-sub">Ккал · Спорт · Привычки</div>
+            </div>
+            <div className={'day-block-status' + (routineDone ? ' status-done' : ' status-empty')}>
+              {routineDone
+                ? <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="square"><polyline points="4,12 9,17 20,6"/></svg>
+                : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              }
+            </div>
+          </div>
+          {routineDone ? (
+            <div className="day-block-footer">
+              <div className="day-block-done-label">✓ Выполнено</div>
+              <a href={routineHref} className="day-block-repeat">Повторить →</a>
+            </div>
+          ) : (
+            <a href={routineHref} className="day-block-btn">{isToday ? 'ОТКРЫТЬ РУТИНУ →' : 'ОТКРЫТЬ →'}</a>
           )}
         </div>
       </div>

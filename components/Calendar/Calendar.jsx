@@ -69,7 +69,7 @@ export default function Calendar() {
           const key = toKey(viewYear, viewMonth, d)
           const isToday = key === todayKey
           const dayData = allData[key] || {}
-          const allDone = dayData.cs && dayData.voice
+          const allDone = dayData.cs && dayData.voice && dayData.routine
           const isFuture = new Date(viewYear, viewMonth, d) > todayDate
           let cls = 'cal-day'
           if (!isFuture) cls += ' cur-month'
@@ -88,6 +88,9 @@ export default function Calendar() {
               </div>
               <div className={'cal-tag' + (dayData.voice ? ' tag-done' : '')}>
                 <span className="cal-tag-check">{dayData.voice ? '✓' : ''}</span>Голос
+              </div>
+              <div className={'cal-tag' + (dayData.routine ? ' tag-done' : '')}>
+                <span className="cal-tag-check">{dayData.routine ? '✓' : ''}</span>Рутина
               </div>
             </div>
           )
