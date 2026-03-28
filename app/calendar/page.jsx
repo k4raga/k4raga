@@ -1,5 +1,5 @@
 import Calendar from '@/components/Calendar/Calendar'
-import './home.css'
+import '../home.css'
 
 const CS_URL      = process.env.NEXT_PUBLIC_CS_URL      || 'https://cs.k4raga.ru'
 const VOICE_URL   = process.env.NEXT_PUBLIC_VOICE_URL   || 'https://voice.k4raga.ru'
