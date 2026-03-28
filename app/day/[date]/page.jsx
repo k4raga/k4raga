@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import './page.css'
 
+const CS_URL    = process.env.NEXT_PUBLIC_CS_URL    || 'https://cs.k4raga.ru'
+const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL || 'https://voice.k4raga.ru'
+
 const MONTH_NAMES = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
 
 function formatDate(dateStr) {
@@ -35,6 +38,9 @@ export default function DayPage() {
 
   const [y, m, d] = date.split('-').map(Number)
   const weekday = new Date(y, m - 1, d).toLocaleDateString('ru-RU', { weekday: 'long' })
+
+  const csHref    = `${CS_URL}/?date=${date}`
+  const voiceHref = `${VOICE_URL}/?date=${date}`
 
   return (
     <div className="day-page">
@@ -71,7 +77,7 @@ export default function DayPage() {
           </div>
           {csDone
             ? <div className="day-block-done-label">Выполнено</div>
-            : <Link href={`/cs-training?date=${date}`} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
+            : <a href={csHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
           }
         </div>
 
@@ -98,7 +104,7 @@ export default function DayPage() {
           </div>
           {voiceDone
             ? <div className="day-block-done-label">Выполнено</div>
-            : <Link href={`/voice-training?date=${date}`} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
+            : <a href={voiceHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>
           }
         </div>
       </div>

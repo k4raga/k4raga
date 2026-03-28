@@ -1,15 +1,21 @@
 export const runtime = 'nodejs'
-import getDb from '@/lib/db'
 
-export function GET() {
-  const db = getDb()
-  const rows = db.prepare('SELECT * FROM training').all()
+const CS_URL    = process.env.CS_APP_URL    || 'http://localhost:3001'
+const VOICE_URL = process.env.VOICE_APP_URL || 'http://localhost:3002'
+
+export async function GET() {
+  const [csRes, voiceRes] = await Promise.all([
+    fetch(`${CS_URL}/api/training`).then(r => r.json()).catch(() => ({})),
+    fetch(`${VOICE_URL}/api/training`).then(r => r.json()).catch(() => ({}))
+  ])
+
   const result = {}
-  for (const row of rows) {
-    result[row.date] = {
-      cs:       Boolean(row.cs),
-      voice:    Boolean(row.voice),
-      cs_tasks: JSON.parse(row.cs_tasks || '[]')
+  const allDates = new Set([...Object.keys(csRes), ...Object.keys(voiceRes)])
+  for (const date of allDates) {
+    result[date] = {
+      cs:       csRes[date]?.done    || false,
+      voice:    voiceRes[date]?.done || false,
+      cs_tasks: csRes[date]?.cs_tasks || []
     }
   }
   return Response.json(result)

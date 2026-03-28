@@ -15,6 +15,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            set -e
+
+            # ── Main site (port 3000) ─────────────────────────────
             cd /var/www/k4raga
             git pull origin main
             npm install
@@ -24,4 +27,36 @@ jobs:
             pm2 delete k4raga 2>/dev/null || true
             pm2 start ./node_modules/.bin/next --name k4raga --cwd /var/www/k4raga -- start -p 3000
             pm2 save
-            echo "Deploy done"
+            echo "Main site deployed"
+
+            # ── CS app (port 3001) ────────────────────────────────
+            mkdir -p /var/www/k4raga-cs
+            rsync -a --delete \
+              --exclude='.next' --exclude='node_modules' --exclude='cs.db' \
+              /var/www/k4raga/cs-app/ /var/www/k4raga-cs/
+            cd /var/www/k4raga-cs
+            npm install
+            rm -rf .next
+            npm run build || true
+            pm2 stop k4raga-cs 2>/dev/null || true
+            pm2 delete k4raga-cs 2>/dev/null || true
+            pm2 start ./node_modules/.bin/next --name k4raga-cs --cwd /var/www/k4raga-cs -- start -p 3001
+            pm2 save
+            echo "CS app deployed"
+
+            # ── Voice app (port 3002) ─────────────────────────────
+            mkdir -p /var/www/k4raga-voice
+            rsync -a --delete \
+              --exclude='.next' --exclude='node_modules' --exclude='voice.db' \
+              /var/www/k4raga/voice-app/ /var/www/k4raga-voice/
+            cd /var/www/k4raga-voice
+            npm install
+            rm -rf .next
+            npm run build || true
+            pm2 stop k4raga-voice 2>/dev/null || true
+            pm2 delete k4raga-voice 2>/dev/null || true
+            pm2 start ./node_modules/.bin/next --name k4raga-voice --cwd /var/www/k4raga-voice -- start -p 3002
+            pm2 save
+            echo "Voice app deployed"
+
+            echo "All done"
