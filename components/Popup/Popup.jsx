@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import './Popup.css'
 
-export default function Popup({ show, icon, title, desc, onClose }) {
+export default function Popup({ show, icon, title, desc, onClose, backHref }) {
   const router = useRouter()
 
   return (
@@ -12,7 +12,9 @@ export default function Popup({ show, icon, title, desc, onClose }) {
         <div className="popup-icon">{icon}</div>
         <div className="popup-title">{title}</div>
         <p className="popup-desc">{desc}</p>
-        <button className="popup-btn" onClick={() => router.push('/')}>На главную</button>
+        <button className="popup-btn" onClick={() => router.push(backHref || '/')}>
+          {backHref ? 'К дню' : 'На главную'}
+        </button>
       </div>
     </div>
   )

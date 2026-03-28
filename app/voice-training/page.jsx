@@ -138,7 +138,7 @@ function VoiceTrainingContent() {
       <p>15 минут на голос — отличная инвестиция.</p>
       <button className="vt-restart-btn" onClick={reset}>ЗАНОВО</button>
       <div className="vt-fin-footer">K4RAGA © 2026</div>
-      <Popup show={popup} icon="🎙️" title="ГОЛОС ПРОКАЧАН!" desc={<>Тренировка голоса завершена —<br/>возвращайся на главную</>} onClose={() => setPopup(false)}/>
+      <Popup show={popup} icon="🎙️" title="ГОЛОС ПРОКАЧАН!" desc={<>Тренировка голоса завершена —<br/>возвращайся к дню</>} backHref={dateKey ? `/day/${dateKey}` : undefined} onClose={() => setPopup(false)}/>
     </div>
   )
 
@@ -192,7 +192,7 @@ function VoiceTrainingContent() {
         </div>
       </div>
       <div className="vt-footer">K4RAGA © 2026</div>
-      <Popup show={popup} icon="🎙️" title="ГОЛОС ПРОКАЧАН!" desc={<>Тренировка голоса завершена —<br/>возвращайся на главную</>} onClose={() => setPopup(false)}/>
+      <Popup show={popup} icon="🎙️" title="ГОЛОС ПРОКАЧАН!" desc={<>Тренировка голоса завершена —<br/>возвращайся к дню</>} backHref={dateKey ? `/day/${dateKey}` : undefined} onClose={() => setPopup(false)}/>
     </div>
   )
 }

@@ -115,7 +115,8 @@ function CSTrainingContent() {
       <div className="cs-footer">K4RAGA © 2026</div>
 
       <Popup show={popup} icon="⭐" title="GG WP!"
-        desc={<>CS тренировка завершена —<br/>возвращайся на главную</>}
+        desc={<>CS тренировка завершена —<br/>возвращайся к дню</>}
+        backHref={dateKey ? `/day/${dateKey}` : undefined}
         onClose={() => setPopup(false)} />
     </div>
   )
