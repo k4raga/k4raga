@@ -10,9 +10,10 @@ export default function getDb() {
     db = new Database(DB_PATH)
     db.exec(`
       CREATE TABLE IF NOT EXISTS training (
-        date      TEXT PRIMARY KEY,
-        done      INTEGER DEFAULT 0,
-        cs_tasks  TEXT    DEFAULT '[]'
+        date        TEXT PRIMARY KEY,
+        done        INTEGER DEFAULT 0,
+        cs_tasks    TEXT    DEFAULT '[]',
+        cs_selected TEXT    DEFAULT '[]'
       );
 
       CREATE TABLE IF NOT EXISTS exercises (
@@ -23,6 +24,8 @@ export default function getDb() {
         active INTEGER NOT NULL DEFAULT 1
       );
     `)
+
+    try { db.exec("ALTER TABLE training ADD COLUMN cs_selected TEXT DEFAULT '[]'") } catch (_) {}
 
     const first = db.prepare('SELECT name FROM exercises WHERE id = 1').get()
     if (!first || first.name !== 'Аим') {

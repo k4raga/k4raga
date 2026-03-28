@@ -112,10 +112,18 @@ function DatePicker({ dateKey, history, onChange }) {
   )
 }
 
+function pickRandom(exercises) {
+  return exercises.map(ex => {
+    const options = ex.hint.split(',').map(s => s.trim()).filter(Boolean)
+    return options[Math.floor(Math.random() * options.length)]
+  })
+}
+
 function CSTrainingContent() {
   const searchParams = useSearchParams()
   const [exercises, setExercises] = useState([])
   const [checked,   setChecked]   = useState([])
+  const [selected,  setSelected]  = useState([])
   const [dateKey,   setDateKey]   = useState(null)
   const [history,   setHistory]   = useState({})
   const [popup,     setPopup]     = useState(false)
@@ -145,11 +153,13 @@ function CSTrainingContent() {
     resolveKey.then(key => {
       setDateKey(key)
       if (shouldReset) {
+        const rand = pickRandom(exercises)
         setChecked(exercises.map(() => false))
+        setSelected(rand)
         fetch('/api/training/' + key, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ done: false, cs_tasks: [] })
+          body: JSON.stringify({ done: false, cs_tasks: [], cs_selected: rand })
         })
         return
       }
@@ -158,6 +168,8 @@ function CSTrainingContent() {
       if (!data) return
       const saved = data.cs_tasks || []
       setChecked(exercises.map((_, i) => !!saved[i]))
+      const savedSel = data.cs_selected || []
+      setSelected(savedSel.length ? savedSel : pickRandom(exercises))
     }).catch(() => {})
   }, [searchParams, exercises])
 
@@ -168,7 +180,12 @@ function CSTrainingContent() {
     fetch('/api/training/' + key).then(r => r.json()).then(data => {
       const saved = data.cs_tasks || []
       setChecked(exercises.map((_, i) => !!saved[i]))
-    }).catch(() => setChecked(exercises.map(() => false)))
+      const savedSel = data.cs_selected || []
+      setSelected(savedSel.length ? savedSel : pickRandom(exercises))
+    }).catch(() => {
+      setChecked(exercises.map(() => false))
+      setSelected(pickRandom(exercises))
+    })
   }
 
   function toggle(i) {
@@ -181,19 +198,21 @@ function CSTrainingContent() {
       fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ done: allDone, cs_tasks: next })
+        body: JSON.stringify({ done: allDone, cs_tasks: next, cs_selected: selected })
       })
     }
   }
 
   function reset() {
+    const rand = pickRandom(exercises)
     setChecked(exercises.map(() => false))
+    setSelected(rand)
     if (dateKey) {
       setHistory(h => ({ ...h, [dateKey]: { done: false, cs_tasks: [] } }))
       fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ done: false, cs_tasks: [] })
+        body: JSON.stringify({ done: false, cs_tasks: [], cs_selected: rand })
       })
     }
   }
@@ -228,7 +247,9 @@ function CSTrainingContent() {
             </div>
             <div className="cs-task-info">
               <div className="cs-task-name">{task.name}</div>
-              <div className="cs-task-hint">{task.hint}</div>
+              {selected[i] && (
+                <div className="cs-task-selected">{selected[i]}</div>
+              )}
             </div>
             <div className="cs-task-icon">{ICONS[i]}</div>
           </label>

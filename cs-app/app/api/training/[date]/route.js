@@ -7,11 +7,12 @@ export function GET(req, { params }) {
   const row = db.prepare('SELECT * FROM training WHERE date = ?').get(date)
   if (row) {
     return Response.json({
-      done:     Boolean(row.done),
-      cs_tasks: JSON.parse(row.cs_tasks || '[]')
+      done:        Boolean(row.done),
+      cs_tasks:    JSON.parse(row.cs_tasks    || '[]'),
+      cs_selected: JSON.parse(row.cs_selected || '[]'),
     })
   }
-  return Response.json({ done: false, cs_tasks: [] })
+  return Response.json({ done: false, cs_tasks: [], cs_selected: [] })
 }
 
 export async function POST(req, { params }) {
@@ -19,15 +20,17 @@ export async function POST(req, { params }) {
   const data = await req.json()
   const db = getDb()
   db.prepare(`
-    INSERT INTO training (date, done, cs_tasks)
-    VALUES (?, ?, ?)
+    INSERT INTO training (date, done, cs_tasks, cs_selected)
+    VALUES (?, ?, ?, ?)
     ON CONFLICT(date) DO UPDATE SET
-      done     = COALESCE(excluded.done,     done),
-      cs_tasks = COALESCE(excluded.cs_tasks, cs_tasks)
+      done        = COALESCE(excluded.done,        done),
+      cs_tasks    = COALESCE(excluded.cs_tasks,    cs_tasks),
+      cs_selected = COALESCE(excluded.cs_selected, cs_selected)
   `).run(
     date,
-    'done'     in data ? (data.done ? 1 : 0)             : null,
-    'cs_tasks' in data ? JSON.stringify(data.cs_tasks)    : null
+    'done'        in data ? (data.done ? 1 : 0)                : null,
+    'cs_tasks'    in data ? JSON.stringify(data.cs_tasks)       : null,
+    'cs_selected' in data ? JSON.stringify(data.cs_selected)    : null,
   )
   return Response.json({ ok: true })
 }
