@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import './Calendar.css'
 
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
@@ -9,6 +10,7 @@ function toKey(y, m, d) {
 }
 
 export default function Calendar() {
+  const router = useRouter()
   const [today, setToday] = useState(new Date())
   const [viewYear, setViewYear] = useState(new Date().getFullYear())
   const [viewMonth, setViewMonth] = useState(new Date().getMonth())
@@ -26,20 +28,8 @@ export default function Calendar() {
         setViewMonth(dt.getMonth())
       })
       .catch(() => {})
-    loadData()
-  }, [])
-
-  function loadData() {
     fetch('/api/training').then(r => r.json()).then(setAllData).catch(() => {})
-  }
-
-  function handleToggle(key, type, cur) {
-    fetch('/api/training/' + key, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [type]: !cur })
-    }).then(loadData)
-  }
+  }, [])
 
   function prevMonth() {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) }
@@ -86,18 +76,17 @@ export default function Calendar() {
           if (isToday) cls += ' today'
           if (allDone) cls += ' done'
           return (
-            <div key={key} className={cls} style={isFuture ? { opacity: 0.3 } : {}}>
+            <div
+              key={key}
+              className={cls}
+              style={isFuture ? { opacity: 0.3 } : {}}
+              onClick={!isFuture ? () => router.push('/day/' + key) : undefined}
+            >
               <div className="cal-day-num">{d}</div>
-              {[['cs','CS'],['voice','Голос']].map(([type, label]) => (
-                <div
-                  key={type}
-                  className={'cal-train' + (dayData[type] ? ' checked' : '')}
-                  onClick={!isFuture ? () => handleToggle(key, type, dayData[type]) : undefined}
-                >
-                  <span className="cal-train-icon">✓</span>
-                  <span>{label}</span>
-                </div>
-              ))}
+              <div className="cal-dots">
+                <span className={'cal-dot-item' + (dayData.cs    ? ' done-dot' : '')} title="CS" />
+                <span className={'cal-dot-item' + (dayData.voice ? ' done-dot' : '')} title="Голос" />
+              </div>
             </div>
           )
         })}

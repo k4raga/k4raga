@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import Calendar from '@/components/Calendar/Calendar'
 import './home.css'
 
@@ -10,35 +9,6 @@ export default function Home() {
         <h1 className="logo">K4RAGA</h1>
         <div className="subtitle">STREAMER · GAMER · GRINDER</div>
         <div className="sep" />
-      </div>
-
-      <div className="cards">
-        <Link className="card" href="/cs-training">
-          <div className="card-icon">
-            <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square">
-              <rect x="3" y="10" width="20" height="12" rx="1"/>
-              <path d="M23 14h4l2 2-2 2h-4"/>
-              <line x1="9" y1="16" x2="13" y2="16"/>
-            </svg>
-          </div>
-          <div className="card-title">CS Тренировка</div>
-          <div className="card-desc">Чеклист навыков: прицел, стрейф, дигл, снайпер — всё перед каткой</div>
-          <div className="card-arrow">Открыть <span>→</span></div>
-        </Link>
-
-        <Link className="card" href="/voice-training">
-          <div className="card-icon">
-            <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square">
-              <rect x="12" y="3" width="8" height="16" rx="1"/>
-              <path d="M8 15v4a8 8 0 0016 0v-4"/>
-              <line x1="16" y1="27" x2="16" y2="31"/>
-              <line x1="11" y1="31" x2="21" y2="31"/>
-            </svg>
-          </div>
-          <div className="card-title">Голос</div>
-          <div className="card-desc">Дыхание, артикуляция, резонанс, интонация — прокачка голоса для стрима</div>
-          <div className="card-arrow">Открыть <span>→</span></div>
-        </Link>
       </div>
 
       <Calendar />
