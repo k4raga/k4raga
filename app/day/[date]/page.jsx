@@ -39,7 +39,7 @@ export default function DayPage() {
   const [y, m, d] = date.split('-').map(Number)
   const weekday = new Date(y, m - 1, d).toLocaleDateString('ru-RU', { weekday: 'long' })
 
-  const csHref    = `${CS_URL}/?date=${date}`
+  const csHref    = `${CS_URL}/training?date=${date}`
   const voiceHref = `${VOICE_URL}/?date=${date}`
 
   return (
