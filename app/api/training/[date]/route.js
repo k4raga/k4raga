@@ -6,8 +6,8 @@ const VOICE_URL = process.env.VOICE_APP_URL || 'http://localhost:3002'
 export async function GET(req, { params }) {
   const { date } = params
   const [csData, voiceData] = await Promise.all([
-    fetch(`${CS_URL}/api/training/${date}`).then(r => r.json()).catch(() => ({ done: false, cs_tasks: [] })),
-    fetch(`${VOICE_URL}/api/training/${date}`).then(r => r.json()).catch(() => ({ done: false }))
+    fetch(`${CS_URL}/api/training/${date}`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ done: false, cs_tasks: [] })),
+    fetch(`${VOICE_URL}/api/training/${date}`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ done: false }))
   ])
   return Response.json({
     cs:       csData.done    || false,

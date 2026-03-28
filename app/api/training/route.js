@@ -6,8 +6,8 @@ const VOICE_URL = process.env.VOICE_APP_URL || 'http://localhost:3002'
 
 export async function GET() {
   const [csRes, voiceRes] = await Promise.all([
-    fetch(`${CS_URL}/api/training`).then(r => r.json()).catch(() => ({})),
-    fetch(`${VOICE_URL}/api/training`).then(r => r.json()).catch(() => ({}))
+    fetch(`${CS_URL}/api/training`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({})),
+    fetch(`${VOICE_URL}/api/training`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({}))
   ])
 
   const result = {}
