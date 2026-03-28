@@ -19,6 +19,8 @@ jobs:
             git pull origin main
             npm install
             npm run build
-            pm2 restart k4raga || pm2 start npm --name k4raga -- start
+            pm2 stop k4raga 2>/dev/null || true
+            pm2 delete k4raga 2>/dev/null || true
+            pm2 start ./node_modules/.bin/next --name k4raga -- start -p 3000
             pm2 save
             echo "Deploy done"
