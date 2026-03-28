@@ -1,6 +1,5 @@
 'use client'
-export const dynamic = 'force-dynamic'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
@@ -64,7 +63,7 @@ function Timer({ progress, timeLeft, color, isRunning }) {
   )
 }
 
-export default function VoiceTraining() {
+function VoiceTrainingContent() {
   const searchParams = useSearchParams()
   const [idx, setIdx]       = useState(0)
   const [timeLeft, setTl]   = useState(EXERCISES[0].duration)
@@ -195,5 +194,13 @@ export default function VoiceTraining() {
       <div className="vt-footer">K4RAGA © 2026</div>
       <Popup show={popup} icon="🎙️" title="ГОЛОС ПРОКАЧАН!" desc={<>Тренировка голоса завершена —<br/>возвращайся на главную</>} onClose={() => setPopup(false)}/>
     </div>
+  )
+}
+
+export default function VoiceTraining() {
+  return (
+    <Suspense fallback={<div className="vt-page" />}>
+      <VoiceTrainingContent />
+    </Suspense>
   )
 }

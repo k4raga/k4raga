@@ -1,6 +1,5 @@
 'use client'
-export const dynamic = 'force-dynamic'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
@@ -20,7 +19,7 @@ const TASKS = [
     icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><rect x="2" y="8" width="28" height="16" rx="3"/><rect x="8" y="13" width="6" height="6"/><circle cx="22" cy="14" r="1.5" fill="#D40000"/><circle cx="22" cy="19" r="1.5" fill="#D40000"/><circle cx="19" cy="16.5" r="1.5" fill="#D40000"/><circle cx="25" cy="16.5" r="1.5" fill="#D40000"/></svg> }
 ]
 
-export default function CSTraining() {
+function CSTrainingContent() {
   const searchParams = useSearchParams()
   const [checked, setChecked] = useState(Array(TASKS.length).fill(false))
   const [dateKey, setDateKey] = useState(null)
@@ -119,5 +118,13 @@ export default function CSTraining() {
         desc={<>CS тренировка завершена —<br/>возвращайся на главную</>}
         onClose={() => setPopup(false)} />
     </div>
+  )
+}
+
+export default function CSTraining() {
+  return (
+    <Suspense fallback={<div className="cs-page" />}>
+      <CSTrainingContent />
+    </Suspense>
   )
 }
