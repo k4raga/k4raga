@@ -40,8 +40,9 @@ export default function DayPage() {
   const [y, m, d] = date.split('-').map(Number)
   const weekday = new Date(y, m - 1, d).toLocaleDateString('ru-RU', { weekday: 'long' })
 
-  const csHref    = `${CS_URL}/training?date=${date}`
-  const voiceHref = `${VOICE_URL}/?date=${date}`
+  const csHref       = `${CS_URL}/training?date=${date}`
+  const csRepeatHref = `${CS_URL}/training?date=${date}&reset=1`
+  const voiceHref    = `${VOICE_URL}/?date=${date}`
 
   return (
     <div className="day-page">
@@ -89,7 +90,7 @@ export default function DayPage() {
           {csDone ? (
             <div className="day-block-footer">
               <div className="day-block-done-label">✓ Выполнено</div>
-              <a href={csHref} className="day-block-repeat">Повторить →</a>
+              <a href={csRepeatHref} className="day-block-repeat">Повторить →</a>
             </div>
           ) : (
             <a href={csHref} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</a>

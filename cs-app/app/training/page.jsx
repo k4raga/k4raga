@@ -134,6 +134,7 @@ function CSTrainingContent() {
 
   useEffect(() => {
     const paramDate = searchParams.get('date')
+    const shouldReset = searchParams.get('reset') === '1'
     const resolveKey = paramDate
       ? Promise.resolve(paramDate)
       : fetch('/api/date').then(r => r.json()).then(d => d.date).catch(() => {
@@ -143,8 +144,18 @@ function CSTrainingContent() {
 
     resolveKey.then(key => {
       setDateKey(key)
+      if (shouldReset) {
+        setChecked(Array(TASKS.length).fill(false))
+        fetch('/api/training/' + key, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ done: false, cs_tasks: [] })
+        })
+        return
+      }
       return fetch('/api/training/' + key).then(r => r.json())
     }).then(data => {
+      if (!data) return
       const saved = data.cs_tasks || []
       setChecked(TASKS.map((_, i) => !!saved[i]))
     }).catch(() => {})
