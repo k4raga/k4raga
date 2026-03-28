@@ -70,7 +70,7 @@ export default function DayPage() {
           </div>
           {csDone
             ? <div className="day-block-done-label">Выполнено</div>
-            : <Link href="/cs-training" className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
+            : <Link href={`/cs-training?date=${date}`} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
           }
         </div>
 
@@ -97,7 +97,7 @@ export default function DayPage() {
           </div>
           {voiceDone
             ? <div className="day-block-done-label">Выполнено</div>
-            : <Link href="/voice-training" className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
+            : <Link href={`/voice-training?date=${date}`} className="day-block-btn">{isToday ? 'НАЧАТЬ ТРЕНИРОВКУ →' : 'ОТКРЫТЬ →'}</Link>
           }
         </div>
       </div>

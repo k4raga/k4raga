@@ -83,9 +83,11 @@ export default function Calendar() {
               onClick={!isFuture ? () => router.push('/day/' + key) : undefined}
             >
               <div className="cal-day-num">{d}</div>
-              <div className="cal-dots">
-                <span className={'cal-dot-item' + (dayData.cs    ? ' done-dot' : '')} title="CS" />
-                <span className={'cal-dot-item' + (dayData.voice ? ' done-dot' : '')} title="Голос" />
+              <div className={'cal-tag' + (dayData.cs ? ' tag-done' : '')}>
+                <span className="cal-tag-check">{dayData.cs ? '✓' : ''}</span>CS
+              </div>
+              <div className={'cal-tag' + (dayData.voice ? ' tag-done' : '')}>
+                <span className="cal-tag-check">{dayData.voice ? '✓' : ''}</span>Голос
               </div>
             </div>
           )

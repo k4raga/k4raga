@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
 
@@ -19,34 +20,39 @@ const TASKS = [
 ]
 
 export default function CSTraining() {
+  const searchParams = useSearchParams()
   const [checked, setChecked] = useState(Array(TASKS.length).fill(false))
-  const [todayKey, setTodayKey] = useState(null)
+  const [dateKey, setDateKey] = useState(null)
   const [popup, setPopup] = useState(false)
 
   const done = checked.filter(Boolean).length
   const total = TASKS.length
 
   useEffect(() => {
-    fetch('/api/date').then(r => r.json())
-      .then(d => { setTodayKey(d.date); return d.date })
-      .then(key => fetch('/api/training/' + key).then(r => r.json()))
-      .then(data => {
-        const saved = data.cs_tasks || []
-        setChecked(TASKS.map((_, i) => !!saved[i]))
-      })
-      .catch(() => {
-        const n = new Date()
-        setTodayKey(n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0'))
-      })
-  }, [])
+    const paramDate = searchParams.get('date')
+    const resolveKey = paramDate
+      ? Promise.resolve(paramDate)
+      : fetch('/api/date').then(r => r.json()).then(d => d.date).catch(() => {
+          const n = new Date()
+          return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0')
+        })
+
+    resolveKey.then(key => {
+      setDateKey(key)
+      return fetch('/api/training/' + key).then(r => r.json())
+    }).then(data => {
+      const saved = data.cs_tasks || []
+      setChecked(TASKS.map((_, i) => !!saved[i]))
+    }).catch(() => {})
+  }, [searchParams])
 
   function toggle(i) {
     const next = checked.map((v, j) => j === i ? !v : v)
     setChecked(next)
     const allDone = next.every(Boolean)
     if (allDone) setPopup(true)
-    if (todayKey) {
-      fetch('/api/training/' + todayKey, {
+    if (dateKey) {
+      fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cs: allDone, cs_tasks: next })
@@ -56,8 +62,8 @@ export default function CSTraining() {
 
   function reset() {
     setChecked(Array(TASKS.length).fill(false))
-    if (todayKey) {
-      fetch('/api/training/' + todayKey, {
+    if (dateKey) {
+      fetch('/api/training/' + dateKey, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cs: false, cs_tasks: [] })

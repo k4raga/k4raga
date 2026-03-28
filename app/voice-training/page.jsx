@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
 
@@ -63,22 +64,28 @@ function Timer({ progress, timeLeft, color, isRunning }) {
 }
 
 export default function VoiceTraining() {
+  const searchParams = useSearchParams()
   const [idx, setIdx]       = useState(0)
   const [timeLeft, setTl]   = useState(EXERCISES[0].duration)
   const [running, setRun]   = useState(false)
   const [elapsed, setEl]    = useState(0)
   const [fin, setFin]       = useState(false)
   const [popup, setPopup]   = useState(false)
-  const [todayKey, setKey]  = useState(null)
+  const [dateKey, setKey]   = useState(null)
   const timerRef = useRef(null)
   const ex = EXERCISES[idx]
 
   useEffect(() => {
-    fetch('/api/date').then(r => r.json()).then(d => setKey(d.date)).catch(() => {
-      const n = new Date()
-      setKey(n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'))
-    })
-  }, [])
+    const paramDate = searchParams.get('date')
+    if (paramDate) {
+      setKey(paramDate)
+    } else {
+      fetch('/api/date').then(r => r.json()).then(d => setKey(d.date)).catch(() => {
+        const n = new Date()
+        setKey(n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'))
+      })
+    }
+  }, [searchParams])
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
@@ -86,10 +93,10 @@ export default function VoiceTraining() {
 
   useEffect(() => {
     if (fin) {
-      if (todayKey) fetch('/api/training/'+todayKey, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({voice:true}) })
+      if (dateKey) fetch('/api/training/'+dateKey, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({voice:true}) })
       setPopup(true)
     }
-  }, [fin, todayKey])
+  }, [fin, dateKey])
 
   useEffect(() => {
     if (running && timeLeft > 0) {
