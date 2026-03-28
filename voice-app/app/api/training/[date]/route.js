@@ -1,7 +1,8 @@
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 import getDb from '@/lib/db'
 
-export function GET(req, { params }) {
+export function GET(_req, { params }) {
   const { date } = params
   const db = getDb()
   const row = db.prepare('SELECT * FROM training WHERE date = ?').get(date)

@@ -1,4 +1,5 @@
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 import getDb from '@/lib/db'
 
 export function GET() {
