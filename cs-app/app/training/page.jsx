@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
 
-const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
+const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://calendar.k4raga.ru'
 
 const ICONS = [
   <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><line x1="16" y1="2" x2="16" y2="12"/><line x1="16" y1="20" x2="16" y2="30"/><line x1="2" y1="16" x2="12" y2="16"/><line x1="20" y1="16" x2="30" y2="16"/><rect x="12" y="12" width="8" height="8"/></svg>,

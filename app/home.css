@@ -70,6 +70,25 @@
 }
 
 
+.landing-link {
+  display: inline-block;
+  margin-top: 32px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 24px;
+  transition: all .3s;
+}
+.landing-link:hover {
+  color: var(--white);
+  border-color: var(--red);
+  box-shadow: 0 0 16px var(--red-glow);
+}
+
 /* === Footer === */
 .footer {
   margin-top: 64px;

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import './page.css'
 
-const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
+const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://calendar.k4raga.ru'
 
 const MONTH   = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
 const WEEKDAY = ['вс','пн','вт','ср','чт','пт','сб']

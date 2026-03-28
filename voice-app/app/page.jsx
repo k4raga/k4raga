@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
 
-const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
+const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://calendar.k4raga.ru'
 
 const EXERCISES = [
   { id:1, title:'Дыхание', subtitle:'Диафрагмальное дыхание', duration:120, icon:'breath', color:'#D40000',

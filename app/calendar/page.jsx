@@ -1,17 +1,17 @@
+import Calendar from '@/components/Calendar/Calendar'
 import './home.css'
-
-const CALENDAR_URL = process.env.NEXT_PUBLIC_CALENDAR_URL || 'https://calendar.k4raga.ru'
 
 export default function Home() {
   return (
-    <div className="page landing">
+    <div className="page">
       <div className="header">
         <div className="live-badge"><span className="live-dot" />LIVE</div>
         <h1 className="logo">K4RAGA</h1>
         <div className="subtitle">STREAMER · GAMER · GRINDER</div>
         <div className="sep" />
-        <a href={CALENDAR_URL} className="landing-link">CALENDAR →</a>
       </div>
+
+      <Calendar />
 
       <div className="footer">
         <a className="social-link" href="https://www.twitch.tv/k4ragatv" target="_blank" rel="noreferrer">
