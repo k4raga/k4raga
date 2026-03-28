@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import Popup from '@/components/Popup/Popup'
 import './page.css'
 
-const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'http://k4raga.ru'
+const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
 
 const TASKS = [
   { num: '01', name: 'Постановка прицела', hint: 'Crosshair placement — держим на уровне головы',

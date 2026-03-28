@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation'
 import logo from '@/lib/logo.js'
 import './Topbar.css'
 
-const CS_URL    = process.env.NEXT_PUBLIC_CS_URL    || 'http://cs.k4raga.ru'
-const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL || 'http://voice.k4raga.ru'
+const CS_URL    = process.env.NEXT_PUBLIC_CS_URL    || 'https://cs.k4raga.ru'
+const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL || 'https://voice.k4raga.ru'
 
 export default function Topbar() {
   const path = usePathname()
