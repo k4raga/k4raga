@@ -94,5 +94,5 @@ def update_training(date):
 
 if __name__ == '__main__':
     init_db()
-    print('Сервер запущен: http://localhost:8080')
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    print('Сервер запущен: http://localhost:5000')
+    app.run(host='127.0.0.1', port=5000, debug=False)
