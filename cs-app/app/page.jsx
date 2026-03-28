@@ -1,140 +1,107 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import Popup from '@/components/Popup/Popup'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import './page.css'
 
 const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
 
-const TASKS = [
-  { num: '01', name: 'Постановка прицела', hint: 'Crosshair placement — держим на уровне головы',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><line x1="16" y1="2" x2="16" y2="12"/><line x1="16" y1="20" x2="16" y2="30"/><line x1="2" y1="16" x2="12" y2="16"/><line x1="20" y1="16" x2="30" y2="16"/><rect x="12" y="12" width="8" height="8"/></svg> },
-  { num: '02', name: 'Остановка на W', hint: 'Counter-strafe — мгновенная остановка перед стрельбой',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><rect x="5" y="5" width="22" height="22"/><line x1="12" y1="11" x2="12" y2="21"/><line x1="20" y1="11" x2="20" y2="21"/></svg> },
-  { num: '03', name: 'Дигл', hint: 'Desert Eagle — тренируем one-tap на дальние дистанции',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><path d="M4 12h18l2 2v4h-6v6h-4v-6H4z"/><line x1="8" y1="12" x2="8" y2="8"/><rect x="22" y="10" width="6" height="4"/></svg> },
-  { num: '04', name: 'Стреляем и ползём', hint: 'Spray transfer + движение — контроль отдачи в движении',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><path d="M4 24l6-4 6 2 6-6 6 2"/><circle cx="8" cy="8" r="2" fill="#D40000"/><circle cx="14" cy="6" r="1.5" fill="#D40000"/><circle cx="11" cy="11" r="1.5" fill="#D40000"/><circle cx="16" cy="12" r="2" fill="#D40000"/><circle cx="20" cy="9" r="1" fill="#D40000"/></svg> },
-  { num: '05', name: 'Скаут / АВП', hint: 'Снайпер — quick scope и flick shots',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><circle cx="16" cy="16" r="11"/><line x1="16" y1="1" x2="16" y2="10"/><line x1="16" y1="22" x2="16" y2="31"/><line x1="1" y1="16" x2="10" y2="16"/><line x1="22" y1="16" x2="31" y2="16"/></svg> },
-  { num: '06', name: 'Чиловая катка', hint: 'Deathmatch или casual — закрепляем всё на практике',
-    icon: <svg viewBox="0 0 32 32" fill="none" stroke="#D40000" strokeWidth="2" strokeLinecap="square"><rect x="2" y="8" width="28" height="16" rx="3"/><rect x="8" y="13" width="6" height="6"/><circle cx="22" cy="14" r="1.5" fill="#D40000"/><circle cx="22" cy="19" r="1.5" fill="#D40000"/><circle cx="19" cy="16.5" r="1.5" fill="#D40000"/><circle cx="25" cy="16.5" r="1.5" fill="#D40000"/></svg> }
+const TASK_NAMES = [
+  'Постановка прицела',
+  'Остановка на W',
+  'Дигл',
+  'Стреляем и ползём',
+  'Скаут / АВП',
+  'Чиловая катка'
 ]
 
-function CSTrainingContent() {
-  const searchParams = useSearchParams()
-  const [checked, setChecked] = useState(Array(TASKS.length).fill(false))
-  const [dateKey, setDateKey] = useState(null)
-  const [popup, setPopup] = useState(false)
+const MONTH = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
+const WEEKDAY = ['вс','пн','вт','ср','чт','пт','сб']
 
-  const done = checked.filter(Boolean).length
-  const total = TASKS.length
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const w = new Date(y, m - 1, d).getDay()
+  return { day: d, month: MONTH[m - 1], weekday: WEEKDAY[w], full: dateStr }
+}
+
+export default function Home() {
+  const [today, setToday] = useState(null)
+  const [history, setHistory] = useState({})
 
   useEffect(() => {
-    const paramDate = searchParams.get('date')
-    const resolveKey = paramDate
-      ? Promise.resolve(paramDate)
-      : fetch('/api/date').then(r => r.json()).then(d => d.date).catch(() => {
-          const n = new Date()
-          return n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0')
-        })
+    fetch('/api/date').then(r => r.json()).then(d => setToday(d.date))
+    fetch('/api/training').then(r => r.json()).then(setHistory)
+  }, [])
 
-    resolveKey.then(key => {
-      setDateKey(key)
-      return fetch('/api/training/' + key).then(r => r.json())
-    }).then(data => {
-      const saved = data.cs_tasks || []
-      setChecked(TASKS.map((_, i) => !!saved[i]))
-    }).catch(() => {})
-  }, [searchParams])
+  const todayDone = today && history[today]?.done
 
-  function toggle(i) {
-    const next = checked.map((v, j) => j === i ? !v : v)
-    setChecked(next)
-    const allDone = next.every(Boolean)
-    if (allDone) setPopup(true)
-    if (dateKey) {
-      fetch('/api/training/' + dateKey, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ done: allDone, cs_tasks: next })
-      })
-    }
-  }
-
-  function reset() {
-    setChecked(Array(TASKS.length).fill(false))
-    if (dateKey) {
-      fetch('/api/training/' + dateKey, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ done: false, cs_tasks: [] })
-      })
-    }
-  }
-
-  const backHref = dateKey ? `${HUB_URL}/day/${dateKey}` : HUB_URL
+  // Sort days descending
+  const days = Object.entries(history)
+    .sort(([a], [b]) => b.localeCompare(a))
 
   return (
-    <div className="cs-page">
-      <nav className="cs-topbar">
-        <a href={HUB_URL} className="cs-topbar-logo">K4RAGA</a>
-        <span className="cs-topbar-title">CS ТРЕНИРОВКА</span>
+    <div className="home">
+      <nav className="home-topbar">
+        <a href={HUB_URL} className="home-topbar-logo">K4RAGA</a>
+        <span className="home-topbar-title">CS ТРЕНИРОВКА</span>
       </nav>
 
-      <div className="cs-header">
-        <h1>CS Тренировка</h1>
-        <p>Выполни все задачи перед каткой</p>
-        <div className="cs-progress-wrap">
-          <div className="cs-progress-bar" style={{ width: (done / total * 100) + '%' }} />
-        </div>
-        <div className="cs-progress-text">{done} / {total}</div>
+      <div className="home-hero">
+        <div className="home-hero-tag">COUNTER-STRIKE</div>
+        <h1 className="home-hero-title">CS Тренировка</h1>
+        <p className="home-hero-sub">Прицел, стрейф, дигл, снайпер</p>
+        <Link
+          href={today ? `/training?date=${today}` : '/training'}
+          className={'home-start-btn' + (todayDone ? ' done' : '')}
+        >
+          {todayDone ? '✓ СЕГОДНЯ ВЫПОЛНЕНО' : 'НАЧАТЬ ТРЕНИРОВКУ →'}
+        </Link>
       </div>
 
-      <div className="cs-task-list">
-        {TASKS.map((task, i) => (
-          <label key={i} className={'cs-task' + (checked[i] ? ' done' : '')} onClick={() => toggle(i)}>
-            <div className="cs-task-number">
-              {checked[i] ? null : <span>{task.num}</span>}
-            </div>
-            <div className="cs-task-info">
-              <div className="cs-task-name">{task.name}</div>
-              <div className="cs-task-hint">{task.hint}</div>
-            </div>
-            <div className="cs-task-icon">{task.icon}</div>
-          </label>
-        ))}
-      </div>
+      {days.length > 0 && (
+        <div className="home-history">
+          <div className="home-history-label">ИСТОРИЯ ТРЕНИРОВОК</div>
+          <div className="home-cards">
+            {days.map(([dateStr, data]) => {
+              const { day, month, weekday } = formatDate(dateStr)
+              const tasks = data.cs_tasks || []
+              const doneCnt = tasks.filter(Boolean).length
+              const isToday = dateStr === today
 
-      {checked.every(Boolean) && (
-        <div className="cs-complete-banner show">
-          <div className="cs-complete-icon">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#4ade80" strokeWidth="3" strokeLinecap="square">
-              <polygon points="24,4 30,18 46,18 33,28 38,44 24,34 10,44 15,28 2,18 18,18"/>
-            </svg>
+              return (
+                <Link key={dateStr} href={`/training?date=${dateStr}`} className={'home-card' + (data.done ? ' card-done' : '')}>
+                  <div className="home-card-head">
+                    <div className="home-card-date">
+                      <span className="home-card-day">{day}</span>
+                      <span className="home-card-month">{month}</span>
+                      {isToday && <span className="home-card-today">сегодня</span>}
+                    </div>
+                    <div className="home-card-weekday">{weekday}</div>
+                    <div className={'home-card-badge' + (data.done ? ' badge-done' : ' badge-fail')}>
+                      {data.done ? 'GG WP' : `${doneCnt}/${TASK_NAMES.length}`}
+                    </div>
+                  </div>
+                  <div className="home-card-tasks">
+                    {TASK_NAMES.map((name, i) => (
+                      <div key={i} className={'home-card-task' + (tasks[i] ? ' task-done' : '')}>
+                        <span className="home-card-task-icon">{tasks[i] ? '✓' : '○'}</span>
+                        <span className="home-card-task-name">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Link>
+              )
+            })}
           </div>
-          <h2>GG WP!</h2>
-          <p>Тренировка завершена — ты готов к рейтингу</p>
         </div>
       )}
 
-      <div className="cs-reset-wrap">
-        <button className="cs-reset-btn" onClick={reset}>Сбросить</button>
-      </div>
-      <div className="cs-footer">K4RAGA © 2026</div>
+      {days.length === 0 && today && (
+        <div className="home-empty">
+          <p>Тренировок ещё нет — начни первую!</p>
+        </div>
+      )}
 
-      <Popup show={popup} icon="⭐" title="GG WP!"
-        desc={<>CS тренировка завершена —<br/>возвращайся к дню</>}
-        backHref={backHref}
-        onClose={() => setPopup(false)} />
+      <div className="home-footer">K4RAGA © 2026</div>
     </div>
-  )
-}
-
-export default function CSTraining() {
-  return (
-    <Suspense fallback={<div className="cs-page" />}>
-      <CSTrainingContent />
-    </Suspense>
   )
 }
