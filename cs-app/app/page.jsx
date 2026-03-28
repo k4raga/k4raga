@@ -50,6 +50,23 @@ export default function Home() {
         </Link>
       </div>
 
+      {exercises.length > 0 && (
+        <div className="home-exercises">
+          <div className="home-exercises-label">ПРОГРАММА ТРЕНИРОВКИ</div>
+          <div className="home-ex-list">
+            {exercises.map((ex) => (
+              <div key={ex.id} className="home-ex-item">
+                <div className="home-ex-num">{ex.num}</div>
+                <div className="home-ex-info">
+                  <div className="home-ex-name">{ex.name}</div>
+                  <div className="home-ex-hint">{ex.hint}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {days.length > 0 && (
         <div className="home-history">
           <div className="home-history-label">ИСТОРИЯ ТРЕНИРОВОК</div>
