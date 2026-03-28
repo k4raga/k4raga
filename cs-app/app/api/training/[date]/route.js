@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 import getDb from '@/lib/db'
 
-export function GET(req, { params }) {
+export function GET(_req, { params }) {
   const { date } = params
   const db = getDb()
   const row = db.prepare('SELECT * FROM training WHERE date = ?').get(date)
@@ -13,6 +13,13 @@ export function GET(req, { params }) {
     })
   }
   return Response.json({ done: false, cs_tasks: [], cs_selected: [] })
+}
+
+export function DELETE(_req, { params }) {
+  const { date } = params
+  const db = getDb()
+  db.prepare('DELETE FROM training WHERE date = ?').run(date)
+  return Response.json({ ok: true })
 }
 
 export async function POST(req, { params }) {

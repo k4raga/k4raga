@@ -28,6 +28,13 @@ export default function Home() {
   const todayDone = today && history[today]?.done
   const days = Object.entries(history).sort(([a], [b]) => b.localeCompare(a))
 
+  function deleteDay(dateStr, e) {
+    e.preventDefault()
+    e.stopPropagation()
+    fetch('/api/training/' + dateStr, { method: 'DELETE' })
+    setHistory(h => { const n = { ...h }; delete n[dateStr]; return n })
+  }
+
   return (
     <div className="home">
       <nav className="home-topbar">
@@ -63,6 +70,7 @@ export default function Home() {
 
                 return (
                   <Link key={dateStr} href={`/training?date=${dateStr}`} className={'home-card' + (data.done ? ' card-done' : '')}>
+                    <button className="home-card-delete" onClick={(e) => deleteDay(dateStr, e)}>✕</button>
                     <div className="home-card-head">
                       <div className="home-card-date">
                         <span className="home-card-day">{day}</span>
