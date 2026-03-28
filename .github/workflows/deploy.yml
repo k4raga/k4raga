@@ -59,4 +59,19 @@ jobs:
             pm2 save
             echo "Voice app deployed"
 
+            # ── Routine app (port 3003) ───────────────────────────
+            mkdir -p /var/www/k4raga-routine
+            rsync -a --delete \
+              --exclude='.next' --exclude='node_modules' \
+              /var/www/k4raga/routine-app/ /var/www/k4raga-routine/
+            cd /var/www/k4raga-routine
+            npm install
+            rm -rf .next
+            npm run build || true
+            pm2 stop k4raga-routine 2>/dev/null || true
+            pm2 delete k4raga-routine 2>/dev/null || true
+            pm2 start ./node_modules/.bin/next --name k4raga-routine --cwd /var/www/k4raga-routine -- start -p 3003
+            pm2 save
+            echo "Routine app deployed"
+
             echo "All done"
