@@ -21,6 +21,13 @@
   color: var(--red);
   text-decoration: none;
 }
+.home-topbar-logo img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
 .home-topbar-title {
   font-family: 'Orbitron', sans-serif;
   font-size: 9px;

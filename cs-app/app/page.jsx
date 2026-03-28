@@ -5,44 +5,34 @@ import './page.css'
 
 const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || 'https://k4raga.ru'
 
-const TASK_NAMES = [
-  'Постановка прицела',
-  'Остановка на W',
-  'Дигл',
-  'Стреляем и ползём',
-  'Скаут / АВП',
-  'Чиловая катка'
-]
-
-const MONTH = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
+const MONTH   = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек']
 const WEEKDAY = ['вс','пн','вт','ср','чт','пт','сб']
 
 function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number)
   const w = new Date(y, m - 1, d).getDay()
-  return { day: d, month: MONTH[m - 1], weekday: WEEKDAY[w], full: dateStr }
+  return { day: d, month: MONTH[m - 1], weekday: WEEKDAY[w] }
 }
 
 export default function Home() {
-  const [today, setToday] = useState(null)
-  const [history, setHistory] = useState({})
+  const [today,     setToday]     = useState(null)
+  const [history,   setHistory]   = useState({})
+  const [exercises, setExercises] = useState([])
 
   useEffect(() => {
     fetch('/api/date').then(r => r.json()).then(d => setToday(d.date))
     fetch('/api/training').then(r => r.json()).then(setHistory)
+    fetch('/api/exercises').then(r => r.json()).then(setExercises).catch(() => {})
   }, [])
 
   const todayDone = today && history[today]?.done
-
-  // Sort days descending
-  const days = Object.entries(history)
-    .sort(([a], [b]) => b.localeCompare(a))
+  const days = Object.entries(history).sort(([a], [b]) => b.localeCompare(a))
 
   return (
     <div className="home">
       <nav className="home-topbar">
         <a href={HUB_URL} className="home-topbar-logo">
-          <img src="/logo.jpg" alt="K4RAGA" className="cs-topbar-img" />
+          <img src="/logo.jpg" alt="K4RAGA" />
           K4RAGA
         </a>
         <span className="home-topbar-title">CS ТРЕНИРОВКА</span>
@@ -66,7 +56,7 @@ export default function Home() {
           <div className="home-cards">
             {days.map(([dateStr, data]) => {
               const { day, month, weekday } = formatDate(dateStr)
-              const tasks = data.cs_tasks || []
+              const tasks  = data.cs_tasks || []
               const doneCnt = tasks.filter(Boolean).length
               const isToday = dateStr === today
 
@@ -80,14 +70,14 @@ export default function Home() {
                     </div>
                     <div className="home-card-weekday">{weekday}</div>
                     <div className={'home-card-badge' + (data.done ? ' badge-done' : ' badge-fail')}>
-                      {data.done ? 'GG WP' : `${doneCnt}/${TASK_NAMES.length}`}
+                      {data.done ? 'GG WP' : `${doneCnt}/${exercises.length || tasks.length}`}
                     </div>
                   </div>
                   <div className="home-card-tasks">
-                    {TASK_NAMES.map((name, i) => (
-                      <div key={i} className={'home-card-task' + (tasks[i] ? ' task-done' : '')}>
+                    {exercises.map((ex, i) => (
+                      <div key={ex.id} className={'home-card-task' + (tasks[i] ? ' task-done' : '')}>
                         <span className="home-card-task-icon">{tasks[i] ? '✓' : '○'}</span>
-                        <span className="home-card-task-name">{name}</span>
+                        <span className="home-card-task-name">{ex.name}</span>
                       </div>
                     ))}
                   </div>
