@@ -1,0 +1,11 @@
+{
+  "name": "k4raga-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node k4raga.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
