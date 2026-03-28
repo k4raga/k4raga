@@ -101,7 +101,11 @@ export default function Home() {
                 <div className="home-ex-num">{ex.num}</div>
                 <div className="home-ex-info">
                   <div className="home-ex-name">{ex.name}</div>
-                  <div className="home-ex-hint">{ex.hint}</div>
+                  <div className="home-ex-tags">
+                    {ex.hint.split(',').map((t, i) => (
+                      <span key={i} className="home-ex-tag">{t.trim()}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
