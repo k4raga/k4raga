@@ -18,6 +18,7 @@ jobs:
             cd /var/www/k4raga
             git pull origin main
             npm install
+            rm -rf .next
             npm run build
             pm2 stop k4raga 2>/dev/null || true
             pm2 delete k4raga 2>/dev/null || true
