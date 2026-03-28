@@ -146,6 +146,23 @@
 }
 .day-block-btn:hover { opacity: .85; transform: translateY(-1px); }
 
+.day-task-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  padding: 4px 0;
+}
+.day-task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.day-task-done { color: var(--white); }
+.day-task-icon { font-size: 10px; color: var(--muted2); width: 12px; flex-shrink: 0; }
+.day-task-done .day-task-icon { color: var(--green); }
+
 .day-block-footer {
   display: flex;
   align-items: center;

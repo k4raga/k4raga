@@ -24,8 +24,9 @@
 .cs-topbar-img {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 50%;
   object-fit: cover;
+  mix-blend-mode: screen;
 }
 .cs-topbar-title {
   font-family: 'Orbitron', sans-serif;

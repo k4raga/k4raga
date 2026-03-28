@@ -1,4 +1,5 @@
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const CS_URL    = process.env.CS_APP_URL    || 'http://localhost:3001'
 const VOICE_URL = process.env.VOICE_APP_URL || 'http://localhost:3002'

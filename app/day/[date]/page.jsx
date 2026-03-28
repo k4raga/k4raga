@@ -9,6 +9,7 @@ const CS_URL    = process.env.NEXT_PUBLIC_CS_URL    || 'https://cs.k4raga.ru'
 const VOICE_URL = process.env.NEXT_PUBLIC_VOICE_URL || 'https://voice.k4raga.ru'
 
 const MONTH_NAMES = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
+const CS_TASK_NAMES = ['Постановка прицела','Остановка на W','Дигл','Стреляем и ползём','Скаут / АВП','Чиловая катка']
 
 function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number)
@@ -75,6 +76,16 @@ export default function DayPage() {
               }
             </div>
           </div>
+          {data?.cs_tasks?.length > 0 && (
+            <div className="day-task-list">
+              {CS_TASK_NAMES.map((name, i) => (
+                <div key={i} className={'day-task' + (data.cs_tasks[i] ? ' day-task-done' : '')}>
+                  <span className="day-task-icon">{data.cs_tasks[i] ? '✓' : '○'}</span>
+                  {name}
+                </div>
+              ))}
+            </div>
+          )}
           {csDone ? (
             <div className="day-block-footer">
               <div className="day-block-done-label">✓ Выполнено</div>
