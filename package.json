@@ -12,11 +12,6 @@
     "next": "^14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "better-sqlite3": "^9.6.0",
-    "adminjs": "^7.8.0",
-    "@adminjs/nextjs": "^6.1.0",
-    "@adminjs/sql": "^1.1.0",
-    "knex": "^3.1.0",
-    "sqlite3": "^5.1.7"
+    "better-sqlite3": "^9.6.0"
   }
 }
