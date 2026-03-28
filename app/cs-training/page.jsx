@@ -2,7 +2,7 @@
 import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-const CS_URL = process.env.NEXT_PUBLIC_CS_URL || 'https://cs.k4raga.ru'
+const CS_URL = process.env.NEXT_PUBLIC_CS_URL || 'http://cs.k4raga.ru'
 
 function Redirect() {
   const searchParams = useSearchParams()
