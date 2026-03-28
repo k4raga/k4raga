@@ -1,4 +1,6 @@
 training.db
 static/
-frontend/node_modules/
-frontend/dist/
+node_modules/
+.next/
+frontend/
+*.py

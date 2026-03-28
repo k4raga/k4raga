@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom'
+'use client'
+import { useRouter } from 'next/navigation'
 import './Popup.css'
 
 export default function Popup({ show, icon, title, desc, onClose }) {
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return (
     <div className={'popup-overlay' + (show ? ' show' : '')}>
@@ -11,7 +12,7 @@ export default function Popup({ show, icon, title, desc, onClose }) {
         <div className="popup-icon">{icon}</div>
         <div className="popup-title">{title}</div>
         <p className="popup-desc">{desc}</p>
-        <button className="popup-btn" onClick={() => navigate('/')}>На главную</button>
+        <button className="popup-btn" onClick={() => router.push('/')}>На главную</button>
       </div>
     </div>
   )

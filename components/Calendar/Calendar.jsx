@@ -1,5 +1,5 @@
+'use client'
 import { useState, useEffect } from 'react'
-import { getAllTraining, saveTraining, getDate } from '../../api/training'
 import './Calendar.css'
 
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
@@ -17,23 +17,28 @@ export default function Calendar() {
   const todayKey = toKey(today.getFullYear(), today.getMonth(), today.getDate())
 
   useEffect(() => {
-    getDate()
-      .then(data => {
-        const d = new Date(data.year, data.month - 1, data.day)
-        setToday(d)
-        setViewYear(d.getFullYear())
-        setViewMonth(d.getMonth())
+    fetch('/api/date')
+      .then(r => r.json())
+      .then(d => {
+        const dt = new Date(d.year, d.month - 1, d.day)
+        setToday(dt)
+        setViewYear(dt.getFullYear())
+        setViewMonth(dt.getMonth())
       })
       .catch(() => {})
     loadData()
   }, [])
 
   function loadData() {
-    getAllTraining().then(setAllData).catch(() => {})
+    fetch('/api/training').then(r => r.json()).then(setAllData).catch(() => {})
   }
 
-  function handleToggle(key, type, currentVal) {
-    saveTraining(key, { [type]: !currentVal }).then(loadData)
+  function handleToggle(key, type, cur) {
+    fetch('/api/training/' + key, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [type]: !cur })
+    }).then(loadData)
   }
 
   function prevMonth() {
@@ -63,13 +68,11 @@ export default function Calendar() {
           <button className="cal-btn" onClick={nextMonth}>→</button>
         </div>
       </div>
-
       <div className="cal-weekdays">
         {['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d => (
           <div key={d} className="cal-weekday">{d}</div>
         ))}
       </div>
-
       <div className="cal-grid">
         {cells.map((d, i) => {
           if (!d) return <div key={'e' + i} className="cal-day empty" />
@@ -78,12 +81,10 @@ export default function Calendar() {
           const dayData = allData[key] || {}
           const allDone = dayData.cs && dayData.voice
           const isFuture = new Date(viewYear, viewMonth, d) > todayDate
-
           let cls = 'cal-day'
           if (!isFuture) cls += ' cur-month'
           if (isToday) cls += ' today'
           if (allDone) cls += ' done'
-
           return (
             <div key={key} className={cls} style={isFuture ? { opacity: 0.3 } : {}}>
               <div className="cal-day-num">{d}</div>
@@ -101,7 +102,6 @@ export default function Calendar() {
           )
         })}
       </div>
-
       <div className="cal-legend">
         <div className="cal-legend-item"><div className="cal-dot dot-today" />Сегодня</div>
         <div className="cal-legend-item"><div className="cal-dot dot-done" />Оба пройдены</div>

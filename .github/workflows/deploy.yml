@@ -5,33 +5,9 @@ on:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package.json
-
-      - name: Install dependencies
-        run: cd frontend && npm install
-
-      - name: Build React app
-        run: cd frontend && npm run build
-
-      - name: Copy build to server via SSH
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "static/*"
-          target: "/var/www/k4raga/"
-          strip_components: 0
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -41,6 +17,8 @@ jobs:
           script: |
             cd /var/www/k4raga
             git pull origin main
-            /var/www/k4raga/venv/bin/pip install -r requirements.txt -q
-            systemctl restart k4raga
+            npm install
+            npm run build
+            pm2 restart k4raga || pm2 start npm --name k4raga -- start
+            pm2 save
             echo "Deploy done"
