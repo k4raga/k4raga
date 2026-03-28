@@ -7,6 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0C0C0E;--surface:#141416;--surface2:#1A1A1E;--border:#2A2A30;--red:#D40000;--red-dim:rgba(212,0,0,0.12);--red-glow:rgba(212,0,0,0.25);--dark-red:#8B0000;--green:#4ade80;--green-glow:rgba(74,222,128,0.3);--white:#F0F0F0;--muted:#6B6B78;--muted2:#45454F;--danger:#ef4444}
+  .popup-overlay{position:fixed;inset:0;background:rgba(12,12,14,0.88);backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .popup-overlay.show{opacity:1;pointer-events:all}
+  .popup{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 36px 36px;max-width:360px;width:90%;text-align:center;position:relative;animation:popIn .4s cubic-bezier(.22,1,.36,1) both}
+  @keyframes popIn{from{transform:scale(.9) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .popup-icon{font-size:48px;margin-bottom:16px}
+  .popup-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;color:var(--white);margin-bottom:8px}
+  .popup-desc{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6}
+  .popup-btn{display:inline-block;background:var(--red);color:var(--white);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;padding:14px 32px;border-radius:50px;text-decoration:none;transition:all .3s}
+  .popup-btn:hover{box-shadow:0 0 24px var(--red-glow);background:#b30000}
+  .popup-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;transition:all .2s}
+  .popup-close:hover{border-color:var(--red);color:var(--red)}
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--white);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden}
   body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px)}
@@ -97,11 +108,87 @@
   <div class="reset-wrap"><button class="reset-btn" id="resetBtn">Сбросить</button></div>
   <div class="footer">K4RAGA © 2026</div>
 </div>
+
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <button class="popup-close" id="popupClose">✕</button>
+    <div class="popup-icon">⭐</div>
+    <div class="popup-title">GG WP!</div>
+    <p class="popup-desc">CS тренировка завершена —<br>возвращайся на главную</p>
+    <a class="popup-btn" href="index.html">На главную</a>
+  </div>
+</div>
 <script>
-  const tasks=document.querySelectorAll('.task'),bar=document.getElementById('progressBar'),text=document.getElementById('progressText'),banner=document.getElementById('completeBanner'),total=tasks.length;
-  function update(){const done=document.querySelectorAll('.task input:checked').length;bar.style.width=(done/total*100)+'%';text.textContent=done+' / '+total;banner.classList.toggle('show',done===total)}
-  tasks.forEach(t=>{const cb=t.querySelector('input');cb.addEventListener('change',()=>{t.classList.toggle('done',cb.checked);update()})});
-  document.getElementById('resetBtn').addEventListener('click',()=>{tasks.forEach(t=>{t.querySelector('input').checked=false;t.classList.remove('done')});update()});
+  const tasks = document.querySelectorAll('.task');
+  const bar = document.getElementById('progressBar');
+  const text = document.getElementById('progressText');
+  const banner = document.getElementById('completeBanner');
+  const total = tasks.length;
+  let todayKey = null;
+
+  function saveToServer(patch){
+    if(!todayKey) return;
+    fetch('/api/training/' + todayKey, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(patch)
+    });
+  }
+
+  function update(){
+    const done = document.querySelectorAll('.task input:checked').length;
+    bar.style.width = (done / total * 100) + '%';
+    text.textContent = done + ' / ' + total;
+    const allDone = done === total;
+    banner.classList.toggle('show', allDone);
+    if(allDone) document.getElementById('popupOverlay').classList.add('show');
+    saveToServer({
+      cs: allDone,
+      cs_tasks: Array.from(tasks).map(t => t.querySelector('input').checked)
+    });
+  }
+
+  tasks.forEach(t => {
+    const cb = t.querySelector('input');
+    cb.addEventListener('change', () => { t.classList.toggle('done', cb.checked); update(); });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    tasks.forEach(t => { t.querySelector('input').checked = false; t.classList.remove('done'); });
+    saveToServer({ cs: false, cs_tasks: [] });
+    update();
+  });
+
+  function loadState(){
+    if(!todayKey) return;
+    fetch('/api/training/' + todayKey)
+      .then(r => r.json())
+      .then(data => {
+        const saved = data.cs_tasks || [];
+        tasks.forEach((t, i) => {
+          const cb = t.querySelector('input');
+          cb.checked = !!saved[i];
+          t.classList.toggle('done', !!saved[i]);
+        });
+        const done = saved.filter(Boolean).length;
+        bar.style.width = (done / total * 100) + '%';
+        text.textContent = done + ' / ' + total;
+        banner.classList.toggle('show', done === total);
+      });
+  }
+
+  document.getElementById('popupClose').addEventListener('click', () => {
+    document.getElementById('popupOverlay').classList.remove('show');
+  });
+
+  fetch('/api/date')
+    .then(r => r.json())
+    .then(data => { todayKey = data.date; loadState(); })
+    .catch(() => {
+      const n = new Date();
+      todayKey = n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0');
+      loadState();
+    });
 </script>
 </body>
 </html>

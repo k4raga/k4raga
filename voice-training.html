@@ -26,6 +26,17 @@
   .topbar-link:hover,.topbar-link.active{color:#F0F0F0;background:rgba(212,0,0,0.12);border-color:rgba(212,0,0,0.2)}
   @media(max-width:560px){.topbar{padding:0 16px}.topbar-nav{display:none}}
   #root{min-height:100vh;padding-top:56px;position:relative;z-index:1}
+  .popup-overlay{position:fixed;inset:0;background:rgba(12,12,14,0.88);backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .popup-overlay.show{opacity:1;pointer-events:all}
+  .popup{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 36px 36px;max-width:360px;width:90%;text-align:center;position:relative;animation:popIn .4s cubic-bezier(.22,1,.36,1) both}
+  @keyframes popIn{from{transform:scale(.9) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .popup-icon{font-size:48px;margin-bottom:16px}
+  .popup-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;color:var(--white);margin-bottom:8px}
+  .popup-desc{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6}
+  .popup-btn{display:inline-block;background:var(--red);color:var(--white);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;padding:14px 32px;border-radius:50px;text-decoration:none;transition:all .3s}
+  .popup-btn:hover{box-shadow:0 0 24px var(--red-glow);background:#b30000}
+  .popup-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;transition:all .2s}
+  .popup-close:hover{border-color:var(--red);color:var(--red)}
 </style>
 </head>
 <body>
@@ -42,6 +53,16 @@
   </div>
 </nav>
 <div id="root"></div>
+
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <button class="popup-close" id="popupClose">✕</button>
+    <div class="popup-icon">🎙️</div>
+    <div class="popup-title">ГОЛОС ПРОКАЧАН!</div>
+    <p class="popup-desc">Тренировка голоса завершена —<br>возвращайся на главную</p>
+    <a class="popup-btn" href="index.html">На главную</a>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
@@ -88,9 +109,10 @@ function App(){
   const[idx,si]=useState(0),[tl,stl]=useState(EXERCISES[0].duration),[run,sr]=useState(false),[ct,sct]=useState(0),[fin,sf]=useState(false);
   const ir=useRef(null),ex=EXERCISES[idx];
   const cl=useCallback(()=>{if(ir.current){clearInterval(ir.current);ir.current=null}},[]);
+  useEffect(()=>{if(fin&&window._voiceDone) window._voiceDone();},[fin]);
   useEffect(()=>{if(run&&tl>0){ir.current=setInterval(()=>{stl(t=>{if(t<=1){cl();if(idx<EXERCISES.length-1){const n=idx+1;sct(c=>c+EXERCISES[idx].duration);si(n);sr(true);return EXERCISES[n].duration}else{sct(TOTAL);sf(true);sr(false);return 0}}return t-1})},1000)}return cl},[run,idx,cl,tl]);
   const go=(i)=>{cl();si(i);stl(EXERCISES[i].duration);sr(false);sct(EXERCISES.slice(0,i).reduce((s,x)=>s+x.duration,0));sf(false)};
-  const skip=()=>{if(idx<EXERCISES.length-1){const n=idx+1;sct(EXERCISES.slice(0,n).reduce((s,x)=>s+x.duration,0));si(n);stl(EXERCISES[n].duration)}};
+  const skip=()=>{if(idx<EXERCISES.length-1){const n=idx+1;sct(EXERCISES.slice(0,n).reduce((s,x)=>s+x.duration,0));si(n);stl(EXERCISES[n].duration)}else{cl();sct(TOTAL);stl(0);sr(false);sf(true)}};
   const rst=()=>{cl();si(0);stl(EXERCISES[0].duration);sr(false);sct(0);sf(false)};
   const el=ct+(EXERCISES[idx].duration-tl),tp=el/TOTAL;
   const btn=(sz,border)=>({width:sz,height:sz,borderRadius:"50%",border:border?"1px solid "+C.border:"none",background:border?"transparent":ex.color,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:border?C.muted:C.bg,fontSize:border?16:22,transition:"all .3s"});
@@ -121,7 +143,7 @@ function App(){
       h("div",{style:{display:"flex",gap:16,alignItems:"center",margin:"24px 0"}},
         h("button",{onClick:rst,style:btn(44,true)},"↺"),
         h("button",{onClick:()=>sr(r=>!r),style:{...btn(64,false),boxShadow:run?"0 0 30px "+ex.color+"40":"0 0 15px "+ex.color+"20"}},run?"❚❚":"▶"),
-        h("button",{onClick:skip,disabled:idx>=EXERCISES.length-1,style:{...btn(44,true),opacity:idx>=EXERCISES.length-1?.3:1}},"⏭"))),
+        h("button",{onClick:skip,style:btn(44,true)},"⏭"))),
     // Instructions
     h("div",{style:{margin:"0 20px 16px",background:"rgba(212,0,0,0.04)",border:"1px solid "+C.border,borderRadius:16,padding:"20px 22px"}},
       h("div",{style:{fontSize:10,textTransform:"uppercase",letterSpacing:".2em",color:ex.color,marginBottom:14,fontWeight:600,fontFamily:"'Orbitron',monospace"}},"ЗАДАНИЯ"),
@@ -142,6 +164,31 @@ function App(){
           h("span",{style:{fontSize:12,fontFamily:"'Orbitron',monospace",color:a?ex.color:C.muted2}},fmt(a?tl:x.duration)))}))),
     h("div",{style:{textAlign:"center",padding:"16px 20px 32px",fontFamily:"'Orbitron',sans-serif",fontSize:10,letterSpacing:3,color:C.muted2}},"K4RAGA © 2026"));
 }
+// — calendar sync & popup —
+let voiceTodayKey = null;
+(function(){
+  window._voiceDone = function(){
+    if(voiceTodayKey){
+      fetch('/api/training/' + voiceTodayKey, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ voice: true })
+      });
+    }
+    document.getElementById('popupOverlay').classList.add('show');
+  };
+  fetch('/api/date')
+    .then(r=>r.json())
+    .then(data=>{ voiceTodayKey = data.date; })
+    .catch(()=>{
+      const n=new Date();
+      voiceTodayKey=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+    });
+  document.getElementById('popupClose').addEventListener('click',()=>{
+    document.getElementById('popupOverlay').classList.remove('show');
+  });
+})();
+
 ReactDOM.render(h(App),document.getElementById("root"));
 </script>
 </body>
