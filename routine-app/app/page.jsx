@@ -131,10 +131,10 @@ function RoutineContent() {
 
         <div className="rt-actions">
           <div className="rt-nav-links">
-            <Link href="/kkal" className="rt-nav-link">Ккал →</Link>
-            <Link href="/sport" className="rt-nav-link">Спорт →</Link>
+            <Link href="/kkal" className="rt-nav-link">ККАЛ →</Link>
+            <Link href="/sport" className="rt-nav-link">СПОРТ →</Link>
           </div>
-          <button className="rt-reset-btn" onClick={reset}>Сбросить</button>
+          <button className="rt-reset-btn" onClick={reset}>СБРОСИТЬ</button>
         </div>
       </div>
 
