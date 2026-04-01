@@ -15,12 +15,77 @@ const ICONS = [
   <svg key="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
 ]
 
+const SCHEDULE = [
+  { time: '07:30', label: 'Подъем' },
+  { time: '09:00', label: 'Планирование' },
+  { time: '09:30', label: 'Обучение' },
+  { time: '10:00', label: 'Тренажер печати' },
+  { time: '10:30', label: 'Рабочий слот' },
+  { time: '12:30', label: 'CS2 тренировка' },
+  { time: '13:30', label: 'Рабочий слот' },
+  { time: '16:40', label: 'Магазин, готовка, обед' },
+  { time: '18:15', label: 'Стрим старт' },
+  { time: '22:00', label: 'Демки + расскидки' },
+  { time: '23:00', label: 'Конец стрима' },
+  { time: '23:30', label: 'Сон' },
+]
+
+function useCountdown() {
+  const [state, setState] = useState({ label: '', time: '', h: 0, m: 0, s: 0 })
+
+  useEffect(() => {
+    function calc() {
+      const now = new Date()
+      const nowMin = now.getHours() * 60 + now.getMinutes()
+      const nowSec = nowMin * 60 + now.getSeconds()
+
+      let next = null
+      for (const item of SCHEDULE) {
+        const [hh, mm] = item.time.split(':').map(Number)
+        const itemSec = hh * 60 * 60 + mm * 60
+        if (itemSec > nowSec) { next = { ...item, sec: itemSec }; break }
+      }
+
+      if (!next) {
+        // после последней задачи — отсчет до первой задачи завтра
+        const [hh, mm] = SCHEDULE[0].time.split(':').map(Number)
+        const itemSec = hh * 60 * 60 + mm * 60
+        const diff = (24 * 3600 - nowSec) + itemSec
+        setState({
+          label: SCHEDULE[0].label,
+          time: SCHEDULE[0].time,
+          h: Math.floor(diff / 3600),
+          m: Math.floor((diff % 3600) / 60),
+          s: diff % 60,
+        })
+        return
+      }
+
+      const diff = next.sec - nowSec
+      setState({
+        label: next.label,
+        time: next.time,
+        h: Math.floor(diff / 3600),
+        m: Math.floor((diff % 3600) / 60),
+        s: diff % 60,
+      })
+    }
+
+    calc()
+    const id = setInterval(calc, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  return state
+}
+
 function RoutineContent() {
   const searchParams = useSearchParams()
   const [habits,  setHabits]  = useState([])
   const [checked, setChecked] = useState([])
   const [dateKey, setDateKey] = useState(null)
   const [popup,   setPopup]   = useState(false)
+  const countdown = useCountdown()
 
   const done  = checked.filter(Boolean).length
   const total = habits.length
@@ -106,6 +171,17 @@ function RoutineContent() {
             <div className="rt-progress-bar" style={{ width: pct + '%' }} />
           </div>
           <div className="rt-progress-text">{done} / {total}</div>
+        </div>
+
+        <div className="rt-countdown">
+          <div className="rt-countdown-label">До: {countdown.label} ({countdown.time})</div>
+          <div className="rt-countdown-digits">
+            <span>{String(countdown.h).padStart(2,'0')}</span>
+            <span className="rt-countdown-sep">:</span>
+            <span>{String(countdown.m).padStart(2,'0')}</span>
+            <span className="rt-countdown-sep">:</span>
+            <span>{String(countdown.s).padStart(2,'0')}</span>
+          </div>
         </div>
 
         <div className="rt-task-list">
